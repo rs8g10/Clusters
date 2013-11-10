@@ -1,5 +1,6 @@
 package testClusters;
 
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferByte;
@@ -44,7 +45,6 @@ public class testClusters extends JPanel {
 							pixel = (short) (pixel + 256);
 						}
 						pixels[j] = pixel;
-						//System.out.println(pixels[j]);
 					}
 					transformImage(pixels, bf.getWidth(), bf.getHeight());
 				}	
@@ -53,20 +53,16 @@ public class testClusters extends JPanel {
 	}
 	
 	private void transformImage(short[] pixels, int w, int h) {
-		//System.out.println(pixels.length);
-		
-		
-		
 		int[] newPixels = new int[pixels.length];
 		
 		float dump_value = 0.1f;
 		float dump_dist = 3.5f;
-		int threshold = 4000;
+		int threshold = 5000;
 		int maxValue = 0;
 		
-		int tx = 20;
-		int ty = 20;
-		int tdiff = 6;
+		int tx = 40;
+		int ty = 40;
+		int tdiff = 5;
 		for (int i = 0; i < w; i++) {
 			for (int j = 0; j < h; j++) {
 				int index = j * w + i;
@@ -96,15 +92,18 @@ public class testClusters extends JPanel {
 		}
 		
 		for (int i = 0; i < newPixels.length; i++) {
-			//System.out.println("Before: " + pixels[i] + ", after: " + newPixels[i]);
 			newPixels[i] = (int) (((float) newPixels[i] / maxValue) * 255);
-			//System.out.println("Now : " + newPixels[i]);
 		}
 		
+		float hueThreshold = 0.7f;
 		int[] rgb = new int[newPixels.length];
 		for (int i = 0; i < newPixels.length; i++) {
 			if (newPixels[i] > 0) {
-				rgb[i] = (newPixels[i] << 16) + (newPixels[i]);
+				float hue = (255.0f - newPixels[i])/255.0f;
+				if (hue < hueThreshold) {
+					Color c = Color.getHSBColor(hue, 0.8f, 0.8f);
+					rgb[i] = c.getRGB();
+				}
 			}
 		}
 		BufferedImage bf = new BufferedImage(w, h, BufferedImage.TYPE_INT_RGB);
